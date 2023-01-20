@@ -1,13 +1,17 @@
 'use strict'
 
 const tracerVersion = require('../../../../package.json').version
+const dc = require('diagnostics_channel')
 const os = require('os')
-const dependencies = require('./dependencies')
 const { sendData } = require('./send-data')
+const dependencies = require('./dependencies')
 
 const HEARTBEAT_INTERVAL = process.env.DD_TELEMETRY_HEARTBEAT_INTERVAL
   ? Number(process.env.DD_TELEMETRY_HEARTBEAT_INTERVAL) * 1000
   : 60000
+
+const telemetryStartChannel = dc.channel('datadog:telemetry:start')
+const telemetryStopChannel = dc.channel('datadog:telemetry:stop')
 
 let config
 let pluginManager
@@ -103,6 +107,10 @@ function createHostObject () {
   }
 }
 
+function getTelemetryData () {
+  return { config, application, host, heartbeatInterval: HEARTBEAT_INTERVAL }
+}
+
 function start (aConfig, thePluginManager) {
   if (!aConfig.telemetryEnabled) {
     return
@@ -118,6 +126,10 @@ function start (aConfig, thePluginManager) {
   }, HEARTBEAT_INTERVAL)
   interval.unref()
   process.on('beforeExit', onBeforeExit)
+
+  if (!aConfig.doNotPublishStartEvent) {
+    telemetryStartChannel.publish(getTelemetryData())
+  }
 }
 
 function stop () {
@@ -126,6 +138,10 @@ function stop () {
   }
   clearInterval(interval)
   process.removeListener('beforeExit', onBeforeExit)
+
+  telemetryStopChannel.publish(getTelemetryData())
+
+  config = undefined
 }
 
 function updateIntegrations () {

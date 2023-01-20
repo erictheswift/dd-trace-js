@@ -73,7 +73,8 @@ describe('telemetry', () => {
       tags: {
         'runtime-id': '1a2b3c'
       },
-      circularObject
+      circularObject,
+      doNotPublishStartEvent: true
     }, {
       _pluginsByName: pluginsByName
     })

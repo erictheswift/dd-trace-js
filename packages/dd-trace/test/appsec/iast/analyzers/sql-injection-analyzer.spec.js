@@ -19,6 +19,8 @@ describe('sql-injection-analyzer', () => {
     './injection-analyzer': InjectionAnalyzer
   })
 
+  sqlInjectionAnalyzer.configure(true)
+
   it('should subscribe to mysql, mysql2 and pg start query channel', () => {
     expect(sqlInjectionAnalyzer._subscriptions).to.have.lengthOf(3)
     expect(sqlInjectionAnalyzer._subscriptions[0]._channel.name).to.equals('apm:mysql:query:start')
@@ -54,6 +56,10 @@ describe('sql-injection-analyzer', () => {
         }
       }
     }
+    const iastPluginContext = {
+      store: {},
+      iastContext
+    }
     const ProxyAnalyzer = proxyquire('../../../../src/appsec/iast/analyzers/vulnerability-analyzer', {
       '../iast-context': {
         getIastContext: () => iastContext
@@ -69,7 +75,7 @@ describe('sql-injection-analyzer', () => {
       {
         './injection-analyzer': InjectionAnalyzer
       })
-    proxiedSqlInjectionAnalyzer.analyze(TAINTED_QUERY)
+    proxiedSqlInjectionAnalyzer.analyze(TAINTED_QUERY, iastPluginContext)
     expect(addVulnerability).to.have.been.calledOnce
     expect(addVulnerability).to.have.been.calledWithMatch({}, { type: 'SQL_INJECTION' })
   })
