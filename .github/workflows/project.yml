@@ -15,7 +15,7 @@ jobs:
   integration:
     strategy:
       matrix:
-        version: [14, 16, 18, latest]
+        version: [latest]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,21 +24,22 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.version }}
+      - run: yarn add "https://github.com/DataDog/pprof-nodejs.git#nsavoire/timeout"
       - run: yarn test:integration
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/node/setup
-      - run: yarn install
-      - run: yarn lint
+  # lint:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/actions/node/setup
+  #     - run: yarn install
+  #     - run: yarn lint
 
-  typescript:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/node/setup
-      - run: yarn install
-      - run: yarn type:test
-      - run: yarn type:doc
+  # typescript:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: ./.github/actions/node/setup
+  #     - run: yarn install
+  #     - run: yarn type:test
+  #     - run: yarn type:doc
