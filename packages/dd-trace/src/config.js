@@ -9,7 +9,6 @@ const coalesce = require('koalas')
 const tagger = require('./tagger')
 const { isTrue, isFalse } = require('./util')
 const uuid = require('crypto-randomuuid')
-const path = require('path')
 
 const fromEntries = Object.fromEntries || (entries =>
   entries.reduce((obj, [k, v]) => Object.assign(obj, { [k]: v }), {}))
@@ -323,13 +322,11 @@ ken|consumer_?(?:id|key|secret)|sign(?:ed|ature)?|auth(?:entication|orization)?)
     )
     const DD_APPSEC_HTTP_BLOCKED_TEMPLATE_HTML = coalesce(
       maybePath(appsec.blockedTemplateHtml),
-      maybePath(process.env.DD_APPSEC_HTTP_BLOCKED_TEMPLATE_HTML),
-      path.join(__dirname, 'appsec', 'templates', 'blocked.html')
+      maybePath(process.env.DD_APPSEC_HTTP_BLOCKED_TEMPLATE_HTML)
     )
     const DD_APPSEC_HTTP_BLOCKED_TEMPLATE_JSON = coalesce(
       maybePath(appsec.blockedTemplateJson),
-      maybePath(process.env.DD_APPSEC_HTTP_BLOCKED_TEMPLATE_JSON),
-      path.join(__dirname, 'appsec', 'templates', 'blocked.json')
+      maybePath(process.env.DD_APPSEC_HTTP_BLOCKED_TEMPLATE_JSON)
     )
 
     const inAWSLambda = process.env.AWS_LAMBDA_FUNCTION_NAME !== undefined

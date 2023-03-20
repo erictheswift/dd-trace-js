@@ -17,6 +17,8 @@ const axios = require('axios')
 const getPort = require('get-port')
 const { resetTemplates } = require('../../src/appsec/blocking')
 
+const templates = require(path.join(__dirname, '..', '..', 'src', 'appsec', 'templates'))
+
 describe('AppSec Index', () => {
   let config
   let AppSec
@@ -31,8 +33,8 @@ describe('AppSec Index', () => {
         wafTimeout: 42,
         obfuscatorKeyRegex: '.*',
         obfuscatorValueRegex: '.*',
-        blockedTemplateHtml: path.join(__dirname, '..', '..', 'src', 'appsec', 'templates', 'blocked.html'),
-        blockedTemplateJson: path.join(__dirname, '..', '..', 'src', 'appsec', 'templates', 'blocked.json')
+        blockedTemplateHtml: templates.html,
+        blockedTemplateJson: templates.json
       }
     }
 
@@ -522,10 +524,8 @@ describe('IP blocking', () => {
 
     describe(`block - ip in header ${ipHeader}`, () => {
       const templatesPath = path.join(__dirname, '..', '..', 'src', 'appsec', 'templates')
-      const htmlDefaultContent = fs.readFileSync(path.join(templatesPath, 'blocked.html'), 'utf8').toString()
-      const jsonDefaultContent = JSON.parse(
-        fs.readFileSync(path.join(templatesPath, 'blocked.json'), 'utf8').toString()
-      )
+      const htmlDefaultContent = require(templatesPath).html
+      const jsonDefaultContent = JSON.parse(templates.json)
 
       it('should block the request with JSON content if no headers', async () => {
         await axios.get(`http://localhost:${port}/`, {

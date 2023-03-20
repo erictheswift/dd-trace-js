@@ -1,7 +1,6 @@
 'use strict'
 
 const fs = require('fs')
-const path = require('path')
 const log = require('../log')
 const RuleManager = require('./rule_manager')
 const remoteConfig = require('./remote_config')
@@ -22,8 +21,11 @@ function enable (_config) {
 
   try {
     loadTemplates(_config)
-    const rules = fs.readFileSync(_config.appsec.rules || path.join(__dirname, 'recommended.json'))
-    enableFromRules(_config, JSON.parse(rules))
+    const rules = _config.appsec.rules
+      ? JSON.parse(fs.readFileSync(_config.appsec.rules))
+      : require('./recommended.json')
+
+    enableFromRules(_config, rules)
   } catch (err) {
     abortEnable(err)
   }
@@ -34,8 +36,15 @@ async function enableAsync (_config) {
 
   try {
     await loadTemplatesAsync(_config)
-    const rules = await fs.promises.readFile(_config.appsec.rules || path.join(__dirname, 'recommended.json'))
-    enableFromRules(_config, JSON.parse(rules))
+    let rules
+    if (_config.appsec.rules) {
+      const rulesStr = await fs.promises.readFile(_config.appsec.rules)
+      rules = JSON.parse(rulesStr)
+    } else {
+      rules = require('./recommended.json')
+    }
+
+    enableFromRules(_config, rules)
   } catch (err) {
     abortEnable(err)
   }

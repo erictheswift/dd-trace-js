@@ -629,10 +629,8 @@ describe('Config', () => {
       wafTimeout: 42,
       obfuscatorKeyRegex: '.*',
       obfuscatorValueRegex: '.*',
-      blockedTemplateHtml:
-        path.join(__dirname, '..', 'src', 'appsec', 'templates', 'blocked.html'),
-      blockedTemplateJson:
-        path.join(__dirname, '..', 'src', 'appsec', 'templates', 'blocked.json')
+      blockedTemplateHtml: undefined,
+      blockedTemplateJson: undefined
     })
   })
 
@@ -761,10 +759,8 @@ describe('Config', () => {
         blockedTemplateJson: path.join(__dirname, 'DOES_NOT_EXIST.json')
       }
     })
-    expect(config.appsec.blockedTemplateHtml).to.be
-      .equal(path.join(__dirname, '..', 'src', 'appsec', 'templates', 'blocked.html'))
-    expect(config.appsec.blockedTemplateJson).to.be
-      .equal(path.join(__dirname, '..', 'src', 'appsec', 'templates', 'blocked.json'))
+    expect(config.appsec.blockedTemplateHtml).to.be.undefined
+    expect(config.appsec.blockedTemplateJson).to.be.undefined
   })
 
   context('auto configuration w/ unix domain sockets', () => {
