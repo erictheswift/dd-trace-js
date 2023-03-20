@@ -1,5 +1,6 @@
 'use strict'
 
+const { expect } = require('chai')
 const { AbortController } = require('node-abort-controller')
 
 describe('blocking', () => {
@@ -11,7 +12,7 @@ describe('blocking', () => {
   }
 
   let log, fs
-  let block, loadTemplates, loadTemplatesAsync, resetTemplates
+  let block, loadTemplates, loadTemplatesAsync, resetTemplates, blockedTemplate
   let req, res, rootSpan
 
   beforeEach(() => {
@@ -25,9 +26,13 @@ describe('blocking', () => {
         readFile: sinon.stub()
       }
     }
-
+    blockedTemplate = {
+      html: 'block test',
+      json: '{ "block": true }'
+    }
     const blocking = proxyquire('../src/appsec/blocking', {
       '../log': log,
+      './templates/blocked': blockedTemplate,
       fs
     })
 
@@ -112,6 +117,31 @@ describe('blocking', () => {
       expect(res.setHeader.secondCall).to.have.been.calledWithExactly('Content-Length', 8)
       expect(res.end).to.have.been.calledOnceWithExactly('jsonBody')
       expect(abortController.signal.aborted).to.be.true
+    })
+  })
+
+  describe('block with default templates', () => {
+    const config = {
+      appsec: {
+        blockedTemplateHtml: undefined,
+        blockedTemplateJson: undefined
+      }
+    }
+    it('should require templates/blocked and use html property', () => {
+      req.headers.accept = 'text/html'
+      loadTemplates(config)
+
+      block(req, res, rootSpan)
+
+      expect(res.end).to.have.been.calledOnceWithExactly(blockedTemplate.html)
+    })
+
+    it('should require templates/blocked and use json property', () => {
+      loadTemplates(config)
+
+      block(req, res, rootSpan)
+
+      expect(res.end).to.have.been.calledOnceWithExactly(blockedTemplate.json)
     })
   })
 

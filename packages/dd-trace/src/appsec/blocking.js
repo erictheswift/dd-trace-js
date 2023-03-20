@@ -42,12 +42,16 @@ function block (req, res, rootSpan, abortController) {
   }
 }
 
+function loadBlockedTemplate () {
+  return require('./templates/blocked')
+}
+
 function loadTemplates (config) {
   if (!templateLoaded) {
     try {
       templateHtml = config.appsec.blockedTemplateHtml
         ? fs.readFileSync(config.appsec.blockedTemplateHtml)
-        : require('./templates/blocked').html
+        : loadBlockedTemplate().html
     } catch (err) {
       log.warn(`Unable to read ${config.appsec.blockedTemplateHtml} from disk.`)
     }
@@ -55,7 +59,7 @@ function loadTemplates (config) {
     try {
       templateJson = config.appsec.blockedTemplateJson
         ? fs.readFileSync(config.appsec.blockedTemplateJson)
-        : require('./templates/blocked').json
+        : loadBlockedTemplate().json
     } catch (err) {
       log.warn(`Unable to read ${config.appsec.blockedTemplateJson} from disk.`)
     }
@@ -68,7 +72,7 @@ async function loadTemplatesAsync (config) {
     try {
       templateHtml = config.appsec.blockedTemplateHtml
         ? await fs.promises.readFile(config.appsec.blockedTemplateHtml)
-        : require('./templates/blocked').html
+        : loadBlockedTemplate().html
     } catch (err) {
       log.warn(`Unable to read ${config.appsec.blockedTemplateHtml} from disk.`)
     }
@@ -76,7 +80,7 @@ async function loadTemplatesAsync (config) {
     try {
       templateJson = config.appsec.blockedTemplateJson
         ? await fs.promises.readFile(config.appsec.blockedTemplateJson)
-        : require('./templates/blocked').json
+        : loadBlockedTemplate().json
     } catch (err) {
       log.warn(`Unable to read ${config.appsec.blockedTemplateJson} from disk.`)
     }
