@@ -4,8 +4,9 @@ const path = require('node:path')
 const { SnapshotKinds, OOMExportStrategies } = require('../constants')
 
 function strategiesToCallbackMode (strategies, CallbackMode) {
-  return (strategies.includes(OOMExportStrategies.InteruptCallback) ? CallbackMode.Interrupt : 0) |
-    (strategies.includes(OOMExportStrategies.AsyncCallback) ? CallbackMode.Async : 0)
+  const hasInterrupt = strategies.includes(OOMExportStrategies.INTERRUPT_CALLBACK) ? CallbackMode.Interrupt : 0
+  const hasCallback = strategies.includes(OOMExportStrategies.ASYNC_CALLBACK) ? CallbackMode.Async : 0
+  return hasInterrupt | hasCallback
 }
 
 class NativeSpaceProfiler {
@@ -20,7 +21,7 @@ class NativeSpaceProfiler {
     this._oomExportStrategies = options.oomExportStrategies || 0
     if (this._oomMonitoring) {
       const tags = [...Object.entries(options.tags),
-        ['snapshot', SnapshotKinds.OnOutOfMemory]].map(([key, value]) => `${key}:${value}`).join(',')
+        ['snapshot', SnapshotKinds.ON_OUT_OF_MEMORY]].map(([key, value]) => `${key}:${value}`).join(',')
       this._oomExportCommand = [process.execPath,
         path.join(__dirname, '..', 'exporter_cli.js'),
         options.url.toString(), tags, this.type]
@@ -36,8 +37,8 @@ class NativeSpaceProfiler {
       this._pprof.heap.monitorOutOfMemory(
         this._oomMonitoring.heapLimitExtensionSize,
         this._oomMonitoring.maxHeapExtensionCount,
-        strategies.includes(OOMExportStrategies.Logs),
-        strategies.includes(OOMExportStrategies.Process) ? this._oomExportCommand : [],
+        strategies.includes(OOMExportStrategies.LOGS),
+        strategies.includes(OOMExportStrategies.PROCESS) ? this._oomExportCommand : [],
         (profile) => nearOOMCallback(this.type, this._pprof.encodeSync(profile)),
         strategiesToCallbackMode(strategies, this._pprof.heap.CallbackMode)
       )

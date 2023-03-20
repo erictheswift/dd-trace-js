@@ -17,9 +17,20 @@ async function exportProfile (url, tags, profileType, profile) {
   }
 
   const encodedProfile = await encode(heap.convertProfile(profile, undefined, mapper))
-  const exporter = new AgentExporter({ url, logger, uploadTimeout: 10 * 1000 })
+  const exporter = new AgentExporter({
+    url,
+    logger,
+    uploadTimeout: 10 * 1000
+  })
   const start = new Date()
-  await exporter.export({ profiles: { [profileType]: encodedProfile }, start, end: start, tags })
+  await exporter.export({
+    profiles: {
+      [profileType]: encodedProfile
+    },
+    start,
+    end: start,
+    tags
+  })
 }
 
 /** Expected command line arguments are:

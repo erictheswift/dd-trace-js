@@ -79,10 +79,12 @@ class Config {
       Number(DD_PROFILING_EXPERIMENTAL_OOM_MAX_HEAP_EXTENSION_COUNT), 0)
     const exportStrategies = ensureOOMExportStrategies(coalesce(options.oomExportStrategies,
       DD_PROFILING_EXPERIMENTAL_OOM_EXPORT_STRATEGIES), this)
-    this.oomMonitoring = { enabled: oomMonitoringEnabled,
+    this.oomMonitoring = {
+      enabled: oomMonitoringEnabled,
       heapLimitExtensionSize,
       maxHeapExtensionCount,
-      exportStrategies }
+      exportStrategies
+    }
     const hostname = coalesce(options.hostname, DD_AGENT_HOST) || 'localhost'
     const port = coalesce(options.port, DD_TRACE_AGENT_PORT) || 8126
     this.url = new URL(coalesce(options.url, DD_TRACE_AGENT_URL, format({

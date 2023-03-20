@@ -48,10 +48,12 @@ class Profiler extends EventEmitter {
     }
 
     try {
-      const nearOOMCallback = (profileType, profile) => this._nearOOMExport(profileType, profile)
       for (const profiler of config.profilers) {
         // TODO: move this out of Profiler when restoring sourcemap support
-        profiler.start({ mapper, nearOOMCallback })
+        profiler.start({
+          mapper,
+          nearOOMCallback: this._nearOOMExport.bind(this)
+        })
         this._logger.debug(`Started ${profiler.type} profiler`)
       }
 
@@ -65,7 +67,9 @@ class Profiler extends EventEmitter {
   _nearOOMExport (profileType, encodedProfile) {
     const start = this._lastStart
     const end = new Date()
-    this._submit({ [profileType]: encodedProfile }, start, end, SnapshotKinds.OnOutOfMemory)
+    this._submit({
+      [profileType]: encodedProfile
+    }, start, end, SnapshotKinds.ON_OUT_OF_MEMORY)
   }
 
   _setInterval () {
@@ -77,7 +81,7 @@ class Profiler extends EventEmitter {
 
     // collect and export current profiles
     // once collect returns, profilers can be safely stopped
-    this._collect(SnapshotKinds.OnShutdown)
+    this._collect(SnapshotKinds.ON_SHUTDOWN)
     this._stop()
   }
 
@@ -101,7 +105,7 @@ class Profiler extends EventEmitter {
     if (!this._enabled) return
     this._lastStart = new Date()
     if (!this._timer || timeout !== this._timeoutInterval) {
-      this._timer = setTimeout(() => this._collect(SnapshotKinds.Periodic), timeout)
+      this._timer = setTimeout(() => this._collect(SnapshotKinds.PERIODIC), timeout)
       this._timer.unref()
     } else {
       this._timer.refresh()
