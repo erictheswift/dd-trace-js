@@ -105,7 +105,8 @@ const json = `{
   "errors": [
     {
       "title": "You've been blocked",
-      "detail": "Sorry, you cannot access this page. Please contact the customer service team. Security provided by Datadog."
+      "detail": "Sorry, you cannot access this page. \
+      Please contact the customer service team. Security provided by Datadog."
     }
   ]
 }`
