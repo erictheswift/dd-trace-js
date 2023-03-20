@@ -17,7 +17,7 @@ const axios = require('axios')
 const getPort = require('get-port')
 const { resetTemplates } = require('../../src/appsec/blocking')
 
-const templates = require(path.join(__dirname, '..', '..', 'src', 'appsec', 'templates'))
+const templates = require(path.join(__dirname, '..', '..', 'src', 'appsec', 'templates', 'blocked'))
 
 describe('AppSec Index', () => {
   let config
@@ -523,7 +523,7 @@ describe('IP blocking', () => {
     })
 
     describe(`block - ip in header ${ipHeader}`, () => {
-      const templatesPath = path.join(__dirname, '..', '..', 'src', 'appsec', 'templates')
+      const templatesPath = path.join(__dirname, '..', '..', 'src', 'appsec', 'templates', 'blocked')
       const htmlDefaultContent = require(templatesPath).html
       const jsonDefaultContent = JSON.parse(templates.json)
 
